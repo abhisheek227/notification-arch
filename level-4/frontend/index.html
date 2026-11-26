@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Level-4 Notification Center (2-Server Architecture)</title>
+    <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <h1>Notification Center <span class="badge">Level 4</span></h1>
+            <p class="subtitle">Server 1 (Producer :4001) &rarr; Server 2 (Notification Engine :4000) &bull; IN_APP + PUSH</p>
+        </div>
+        <div class="header-actions">
+            <span id="sseStatus" class="pill pill-offline">SSE: Connecting...</span>
+            <button id="pushPermBtn" class="btn btn-secondary">Enable Browser Push</button>
+            <div class="bell-wrapper">
+                <span class="bell-icon">&#128276;</span>
+                <span id="unreadBadge" class="unread-badge">0</span>
+            </div>
+        </div>
+    </header>
+
+    <nav class="tabs">
+        <button class="tab active" data-tab="inbox">In-App Inbox</button>
+        <button class="tab" data-tab="trigger">Trigger Events (Server 1)</button>
+        <button class="tab" data-tab="settings">User Settings</button>
+        <button class="tab" data-tab="audit">Templates &amp; Deliveries</button>
+    </nav>
+
+    <main class="container">
+        <!-- TAB 1: IN-APP INBOX -->
+        <section id="tab-inbox" class="panel active">
+            <div class="panel-header">
+                <h2>In-App Notifications</h2>
+                <div class="actions">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="unreadOnlyToggle" /> Unread only
+                    </label>
+                    <button id="markAllReadBtn" class="btn btn-secondary">Mark All Read</button>
+                </div>
+            </div>
+            <div id="inboxList" class="list"></div>
+        </section>
+
+        <!-- TAB 2: TRIGGER SIMULATOR (CALLS SERVER 1 -> SERVER 2) -->
+        <section id="tab-trigger" class="panel">
+            <div class="panel-header">
+                <h2>Trigger Events via Producer Server (Port 4001)</h2>
+            </div>
+            <p class="hint">These buttons send HTTP POST requests to <code>http://localhost:4001</code>, which dispatches them to <code>http://localhost:4000/api/v1/internal/notifications/dispatch</code>.</p>
+            <div class="trigger-grid">
+                <div class="card">
+                    <h3>Critical Vulnerability</h3>
+                    <p>Triggers <code>vuln.found</code> with severity <strong>CRITICAL</strong>.</p>
+                    <button class="btn btn-danger" onclick="triggerPreset('/trigger/vulnerability', { severity: 'CRITICAL', vuln_name: 'Remote Code Execution', cve: 'CVE-2026-9911', vuln_count: 1 })">
+                        Fire Critical Alert
+                    </button>
+                </div>
+                <div class="card">
+                    <h3>Low Severity Vulnerability</h3>
+                    <p>Triggers <code>vuln.found</code> with severity <strong>LOW</strong> (test min_severity filter).</p>
+                    <button class="btn btn-warning" onclick="triggerPreset('/trigger/vulnerability', { severity: 'LOW', vuln_name: 'Missing Security Header', cve: 'CVE-2026-0012', vuln_count: 1 })">
+                        Fire Low Alert
+                    </button>
+                </div>
+                <div class="card">
+                    <h3>Scan Completed (0 Vulns)</h3>
+                    <p>Triggers <code>scan.completed</code> with <code>vuln_count: 0</code> (test <em>only_if_vuln_found</em>).</p>
+                    <button class="btn btn-primary" onclick="triggerPreset('/trigger/scan-completed', { vuln_count: 0 })">
+                        Fire Clean Scan
+                    </button>
+                </div>
+                <div class="card">
+                    <h3>Scan Completed (3 Vulns)</h3>
+                    <p>Triggers <code>scan.completed</code> with <code>vuln_count: 3</code>.</p>
+                    <button class="btn btn-primary" onclick="triggerPreset('/trigger/scan-completed', { vuln_count: 3 })">
+                        Fire Scan With Vulns
+                    </button>
+                </div>
+                <div class="card">
+                    <h3>Mandatory Auth Login</h3>
+                    <p>Triggers <code>auth.new_login</code> (mandatory — ignores user mute).</p>
+                    <button class="btn btn-secondary" onclick="triggerPreset('/trigger/auth-login', {})">
+                        Fire New Login
+                    </button>
+                </div>
+            </div>
+            <pre id="triggerOutput" class="code-box">Trigger response will appear here...</pre>
+        </section>
+
+        <!-- TAB 3: USER SETTINGS -->
+        <section id="tab-settings" class="panel">
+            <div class="panel-header">
+                <h2>User Notification Settings (<code>notification_user_setting</code>)</h2>
+            </div>
+            <div id="settingsList" class="settings-grid"></div>
+        </section>
+
+        <!-- TAB 4: TEMPLATES & DELIVERIES -->
+        <section id="tab-audit" class="panel">
+            <div class="panel-header">
+                <h2>Delivery Audit Log (<code>notification_delivery</code>)</h2>
+                <button id="refreshAuditBtn" class="btn btn-secondary">Refresh</button>
+            </div>
+            <div id="deliveryList" class="list"></div>
+
+            <div class="panel-header" style="margin-top: 24px;">
+                <h2>Active Templates (<code>notification_template</code>)</h2>
+            </div>
+            <div id="templateList" class="list"></div>
+        </section>
+    </main>
+
+    <!-- Push Notification Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="/app.js"></script>
+</body>
+</html>

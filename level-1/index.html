@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Service</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Toast Container (for pop-up notifications) -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-title">
+                <h1>Notifications</h1>
+                <span id="unread-count" class="badge">2</span>
+            </div>
+            <div class="header-actions">
+                <button id="mark-all-read-btn" class="btn btn-secondary" type="button">Mark all read</button>
+                <button id="clear-all-btn" class="btn btn-danger-outline" type="button">Clear all</button>
+            </div>
+        </header>
+
+        <!-- Main Layout -->
+        <main class="main-grid">
+            <!-- Left: Trigger / Composer Panel -->
+            <section class="panel composer-panel" aria-labelledby="composer-heading">
+                <h2 id="composer-heading" class="panel-title">Send Notification</h2>
+                <form id="notification-form" class="form">
+                    <div class="form-group">
+                        <label for="notif-title">Title</label>
+                        <input id="notif-title" name="title" type="text" placeholder="e.g. New deployment" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notif-message">Message</label>
+                        <textarea id="notif-message" name="message" rows="3" placeholder="Write notification details..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notif-type">Type</label>
+                        <select id="notif-type" name="type">
+                            <option value="info">Info</option>
+                            <option value="success">Success</option>
+                            <option value="warning">Warning</option>
+                            <option value="error">Error</option>
+                        </select>
+                    </div>
+
+                    <button id="send-notif-btn" class="btn btn-primary" type="submit">Send Notification</button>
+                </form>
+            </section>
+
+            <!-- Right: Notification Feed -->
+            <section class="panel feed-panel" aria-labelledby="feed-heading">
+                <div class="feed-header">
+                    <h2 id="feed-heading" class="panel-title">Feed</h2>
+                    <div class="filter-bar" role="tablist" aria-label="Filter notifications">
+                        <button class="filter-btn active" data-filter="all" type="button">All</button>
+                        <button class="filter-btn" data-filter="unread" type="button">Unread</button>
+                        <button class="filter-btn" data-filter="info" type="button">Info</button>
+                        <button class="filter-btn" data-filter="success" type="button">Success</button>
+                        <button class="filter-btn" data-filter="warning" type="button">Warning</button>
+                        <button class="filter-btn" data-filter="error" type="button">Error</button>
+                    </div>
+                </div>
+
+                <!-- Notification List -->
+                <ul id="notification-list" class="notification-list">
+                    <!-- Sample Unread Notification -->
+                    <li class="notification-card unread type-info" data-id="sample-1" data-type="info">
+                        <div class="notification-indicator"></div>
+                        <div class="notification-body">
+                            <div class="notification-meta">
+                                <span class="notification-title">System Update</span>
+                                <span class="notification-time">Just now</span>
+                            </div>
+                            <p class="notification-message">Notification service skeleton is ready for your JavaScript.</p>
+                        </div>
+                        <button class="icon-btn dismiss-btn" type="button" aria-label="Dismiss notification">&times;</button>
+                    </li>
+
+                    <!-- Sample Read Notification -->
+                    <li class="notification-card type-success" data-id="sample-2" data-type="success">
+                        <div class="notification-indicator"></div>
+                        <div class="notification-body">
+                            <div class="notification-meta">
+                                <span class="notification-title">Connected</span>
+                                <span class="notification-time">2m ago</span>
+                            </div>
+                            <p class="notification-message">Successfully initialized notification channel.</p>
+                        </div>
+                        <button class="icon-btn dismiss-btn" type="button" aria-label="Dismiss notification">&times;</button>
+                    </li>
+                </ul>
+
+                <!-- Empty State (toggle .hidden via JS) -->
+                <div id="empty-state" class="empty-state hidden">
+                    <p>No notifications to display.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="src.js"></script>
+</body>
+</html>

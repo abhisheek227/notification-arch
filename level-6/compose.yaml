@@ -1,0 +1,77 @@
+services:
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  dev:
+    build:
+      context: ./dev
+      dockerfile: Dockerfile
+    container_name: dev-api
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+
+  ps:
+    build:
+      context: ./ps
+      dockerfile: Dockerfile
+    container_name: ps-worker
+    environment:
+      PORT: 3001
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+
+  notification:
+    build:
+      context: ./notification
+      dockerfile: Dockerfile
+    container_name: notification-service
+    ports:
+      - "3002:3002"
+    environment:
+      PORT: 3002
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      DB_PATH: /app/data/notifications.db
+      VAPID_SUBJECT: mailto:admin@example.com
+    volumes:
+      - ./notifications.db:/app/data/notifications.db
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:3000
+        VITE_NOTIFICATION_URL: http://localhost:3002
+    container_name: web-fe
+    ports:
+      - "5173:80"
+    depends_on:
+      - dev
+      - notification
+    restart: unless-stopped

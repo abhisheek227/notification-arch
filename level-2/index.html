@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Service — Level 2 (API Fetch)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-title">
+                <h1>Notifications</h1>
+                <span id="unread-count" class="badge">0</span>
+            </div>
+            <div class="header-actions">
+                <button id="mark-all-read-btn" class="btn btn-secondary" type="button">Mark all read</button>
+                <button id="clear-all-btn" class="btn btn-danger-outline" type="button">Clear all</button>
+            </div>
+        </header>
+
+        <!-- Main Layout -->
+        <main class="main-grid">
+            <!-- Left: API Fetcher Panel -->
+            <section class="panel fetcher-panel" aria-labelledby="fetcher-heading">
+                <div class="panel-header">
+                    <h2 id="fetcher-heading" class="panel-title">API Source</h2>
+                    <span id="fetch-status" class="status-pill">Idle</span>
+                </div>
+
+                <form id="fetch-form" class="form">
+                    <div class="form-group">
+                        <label for="api-source">Choose API</label>
+                        <select id="api-source" name="source">
+                            <option value="random">Random (Any API below)</option>
+                            <option value="jsonplaceholder">JSONPlaceholder (Random Post)</option>
+                            <option value="advice">Advice Slip (Random Advice)</option>
+                            <option value="joke">Official Joke API (Random Joke)</option>
+                            <option value="custom">Custom JSON URL</option>
+                        </select>
+                    </div>
+
+                    <div id="custom-url-group" class="form-group hidden">
+                        <label for="custom-url">Custom API URL</label>
+                        <input id="custom-url" type="url" placeholder="https://jsonplaceholder.typicode.com/todos/1">
+                    </div>
+
+                    <button id="fetch-now-btn" class="btn btn-primary" type="submit">Fetch Notification</button>
+                </form>
+
+                <hr class="divider">
+
+                <!-- Auto-Polling Controls -->
+                <div class="poll-controls">
+                    <div class="form-group">
+                        <label for="poll-interval">Auto-Fetch Interval</label>
+                        <select id="poll-interval">
+                            <option value="5000">Every 5 seconds</option>
+                            <option value="10000" selected>Every 10 seconds</option>
+                            <option value="30000">Every 30 seconds</option>
+                        </select>
+                    </div>
+                    <button id="poll-toggle-btn" class="btn btn-secondary" type="button">Start Auto-Fetch</button>
+                </div>
+            </section>
+
+            <!-- Right: Notification Feed -->
+            <section class="panel feed-panel" aria-labelledby="feed-heading">
+                <div class="feed-header">
+                    <h2 id="feed-heading" class="panel-title">Feed</h2>
+                    <div class="filter-bar" role="tablist" aria-label="Filter notifications">
+                        <button class="filter-btn active" data-filter="all" type="button">All</button>
+                        <button class="filter-btn" data-filter="unread" type="button">Unread</button>
+                        <button class="filter-btn" data-filter="info" type="button">Info</button>
+                        <button class="filter-btn" data-filter="success" type="button">Success</button>
+                        <button class="filter-btn" data-filter="warning" type="button">Warning</button>
+                        <button class="filter-btn" data-filter="error" type="button">Error</button>
+                    </div>
+                </div>
+
+                <!-- Notification List -->
+                <ul id="notification-list" class="notification-list"></ul>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="empty-state">
+                    <p>No notifications yet. Click <strong>Fetch Notification</strong> to pull data from an API.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="src.js"></script>
+</body>
+</html>
